@@ -42,6 +42,9 @@
     <Reference Include="PlayMaker">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\PlayMaker.dll</HintPath>
     </Reference>
+    <Reference Include="SFCore">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Mods\SFCore.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\System.Core.dll</HintPath>
     </Reference>
@@ -100,7 +103,6 @@
     <Compile Include="Uuwuu.cs" />
     <Compile Include="Uumuu.cs" />
     <Compile Include="UumuuFinder.cs" />
-    <Compile Include="CharmHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Spellmaster.png" />

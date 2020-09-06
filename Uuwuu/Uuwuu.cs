@@ -7,7 +7,7 @@ using Language;
 using Modding;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Uuwuu;
+using SFCore;
 
 namespace Uuwuu
 {
@@ -39,34 +39,46 @@ namespace Uuwuu
 		}
 		private int OnGetPlayerIntHook(string target)
 		{
-			if (target == "charmCost_" + charmnum1.ToString())
+			if (target.Contains("charmCost_"))
 			{
-				return 6;
+				int charmNum = int.Parse(target.Split('_')[1]);
+				if (target.Contains("charmCost_") && ChHelper.charmIDs.Contains(charmNum))
+				{
+					return 6;
+				}
 			}
 			return PlayerData.instance.GetIntInternal(target);
 		}
 
 		private bool OnGetPlayerBoolHook(string target)
 		{
-			if (target == "newCharm_" + charmnum1.ToString())
+			if (target.Contains("Charm_"))
 			{
-				return false;
-			}
-			if (target == "gotCharm_" + charmnum1.ToString())
-			{
-				return true;
-			}
-			if (target == "equippedCharm_" + charmnum1.ToString())
-			{
-				return Settings.EquippedCharm;
+				int charmNum = int.Parse(target.Split('_')[1]);
+				if (target.Contains("newCharm_") && ChHelper.charmIDs.Contains(charmNum))
+				{
+					return false;
+				}
+				if (target.Contains("gotCharm_") && ChHelper.charmIDs.Contains(charmNum))
+				{
+					return true;
+				}
+				if (target.Contains("equippedCharm_") && ChHelper.charmIDs.Contains(charmNum))
+				{
+					return base.Settings.EquippedCharm;
+				}
 			}
 			return PlayerData.instance.GetBoolInternal(target);
 		}
 		private void OnSetPlayerBoolHook(string target, bool boo)
 		{
-			if (target == "equippedCharm_" + charmnum1.ToString())
+			if (target.Contains("Charm_"))
 			{
-				Settings.EquippedCharm = boo;
+				int charmNum = int.Parse(target.Split('_')[1]);
+				if (target.Contains("equippedCharm_") && ChHelper.charmIDs.Contains(charmNum))
+				{
+					base.Settings.EquippedCharm = boo;
+				}
 			}
 			PlayerData.instance.SetBoolInternal(target, boo);
 		}
@@ -76,13 +88,17 @@ namespace Uuwuu
 		{
 			if (key != null)
 			{
-				if (key == "CHARM_NAME_" + charmnum1.ToString())
+				if (key.Contains("CHARM_"))
 				{
-					return "Ooma Core";
-				}
-				if (key == "CHARM_DESC_" + charmnum1.ToString())
-				{
-					return "Uuwuu will grant you some mercy.";
+					int charmNum = int.Parse(key.Split('_')[2]);
+					if (key.Contains("CHARM_NAME_") && ChHelper.charmIDs.Contains(charmNum))
+					{
+						return "Ooma Core";
+					}
+					if (key.Contains("CHARM_DESC_") && ChHelper.charmIDs.Contains(charmNum))
+					{
+						return "Uuwuu will grant you some mercy.";
+					}
 				}
 				if (key == "MEGA_JELLY_MAIN" && PlayerData.instance.statueStateUumuu.usingAltVersion)
 				{
@@ -191,6 +207,8 @@ namespace Uuwuu
 				}
 			}
 			this.ChHelper = new CharmHelper();
+			ChHelper.customCharms = 1;
+			ChHelper.customSprites[0] = Uuwuu.Instance.Sprites2[1];
 		}
 
 		private void Instance_BeforeSavegameSaveHook(SaveGameData data)

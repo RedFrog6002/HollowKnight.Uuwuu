@@ -8,6 +8,7 @@ using Modding;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using SFCore;
+using FrogCore;
 
 namespace Uuwuu
 {
@@ -127,20 +128,24 @@ namespace Uuwuu
 		// Token: 0x0600004C RID: 76 RVA: 0x0000235A File Offset: 0x0000055A
 		private void SaveGame(SaveGameData data)
 		{
-			Uuwuu.AddComponent();
+			AddComponent();
 		}
 
 		// Token: 0x0600004E RID: 78 RVA: 0x00002384 File Offset: 0x00000584
-		private static void AddComponent()
+		private void AddComponent()
 		{
 			GameManager.instance.gameObject.AddComponent<UumuuFinder>();
+			jh.playerData.haskilled = Settings.haskilled;
+			jh.playerData.killsremaining = Settings.killsleft;
+			jh.playerData.newentry = Settings.newentry;
 		}
 
 		// Token: 0x0600004F RID: 79 RVA: 0x00003350 File Offset: 0x00001550
 		public void Unload()
 		{
+			ModHooks.Instance.BeforeSavegameSaveHook -= Instance_BeforeSavegameSaveHook;
 			ModHooks.Instance.AfterSavegameLoadHook -= this.SaveGame;
-			ModHooks.Instance.NewGameHook -= Uuwuu.AddComponent;
+			ModHooks.Instance.NewGameHook -= AddComponent;
 			ModHooks.Instance.LanguageGetHook -= this.OnLangGet;
 			UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= this.SceneChanged;
 			ModHooks.Instance.GetPlayerVariableHook -= this.GetVariableHook;
@@ -172,7 +177,7 @@ namespace Uuwuu
 			this.SetupSettings();
 			ModHooks.Instance.BeforeSavegameSaveHook += Instance_BeforeSavegameSaveHook;
 			ModHooks.Instance.AfterSavegameLoadHook += this.SaveGame;
-			ModHooks.Instance.NewGameHook += Uuwuu.AddComponent;
+			ModHooks.Instance.NewGameHook += AddComponent;
 			ModHooks.Instance.LanguageGetHook += this.OnLangGet;
 			UnityEngine.SceneManagement.SceneManager.activeSceneChanged += this.SceneChanged;
 			ModHooks.Instance.GetPlayerVariableHook += this.GetVariableHook;
@@ -200,20 +205,77 @@ namespace Uuwuu
 						tex.LoadImage(buffer);
 
 						//Create sprite from texture
-						Sprites.Add(res, Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
-						Sprites2[1] = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+						Sprites.Add("Charm", Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
+						Log("Created sprite from embedded image: " + res);
+					}
+				}
+				if (res.Contains("Uumuu_picture.png"))
+				{
+					using (Stream s = asm.GetManifestResourceStream(res))
+					{
+						if (s == null) continue;
+						byte[] buffer = new byte[s.Length];
+						s.Read(buffer, 0, buffer.Length);
+						s.Dispose();
+
+						//Create texture from bytes
+						Texture2D tex = new Texture2D(1, 1);
+						tex.LoadImage(buffer);
+
+						//Create sprite from texture
+						Sprites.Add("Picture", Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
+						Log("Created sprite from embedded image: " + res);
+					}
+				}
+				if (res.Contains("Uumuu_portrait.png"))
+				{
+					using (Stream s = asm.GetManifestResourceStream(res))
+					{
+						if (s == null) continue;
+						byte[] buffer = new byte[s.Length];
+						s.Read(buffer, 0, buffer.Length);
+						s.Dispose();
+
+						//Create texture from bytes
+						Texture2D tex = new Texture2D(1, 1);
+						tex.LoadImage(buffer);
+
+						//Create sprite from texture
+						Sprites.Add("Portrait", Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
+						Log("Created sprite from embedded image: " + res);
+					}
+				}
+				if (res.Contains("divider.png"))
+				{
+					using (Stream s = asm.GetManifestResourceStream(res))
+					{
+						if (s == null) continue;
+						byte[] buffer = new byte[s.Length];
+						s.Read(buffer, 0, buffer.Length);
+						s.Dispose();
+
+						//Create texture from bytes
+						Texture2D tex = new Texture2D(1, 1);
+						tex.LoadImage(buffer);
+
+						//Create sprite from texture
+						Sprites.Add("Divider", Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f)));
 						Log("Created sprite from embedded image: " + res);
 					}
 				}
 			}
 			this.ChHelper = new CharmHelper();
 			ChHelper.customCharms = 1;
-			ChHelper.customSprites[0] = Uuwuu.Instance.Sprites2[1];
+			ChHelper.customSprites[0] = Uuwuu.Instance.Sprites["Charm"];
+			jh = JournalHelper.AddJournalEntry(Sprites["Portrait"], Sprites["Picture"], new JournalHelper.JournalPlayerData() { haskilled = false, Hidden = true, killsremaining = 3, newentry = true }, new JournalHelper.JournalNameStrings() { name = "Uuwuu", desc = "Hidden master of the Fog Canyon", note = "I'm gonna kill you uwu - Uuwuu", shortname = "Uuwuu" }, JournalHelper.EntryType.Custom, Sprites["Divider"]);
 		}
-
+		public JournalHelper jh { get; set; }
 		private void Instance_BeforeSavegameSaveHook(SaveGameData data)
 		{
 			PlayerData.instance.statueStateUumuu.usingAltVersion = false;
+			Settings.haskilled = jh.playerData.haskilled;
+			Settings.killsleft = jh.playerData.killsremaining;
+			Settings.newentry = jh.playerData.newentry;
 		}
 
 		private void SetupSettings()
@@ -267,8 +329,6 @@ namespace Uuwuu
 		public int charmnum1 = 41;
 
 		public Dictionary<string, Sprite> Sprites = new Dictionary<string, Sprite>();
-
-		public Sprite[] Sprites2 = new Sprite[2];
 		public CharmHelper ChHelper { get; private set; }
 	}
 }

@@ -19,5 +19,8 @@ namespace Uuwuu
 				base.SetBool(value);
 			}
 		}
+		public bool haskilled = false;
+		public bool newentry = true;
+		public int killsleft = 3;
 	}
 }

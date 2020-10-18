@@ -63,7 +63,6 @@ namespace Uuwuu
 		}
 		private Vector2 box;
 		private Vector2 circle;
-		// Token: 0x06000090 RID: 144 RVA: 0x0000253E File Offset: 0x0000073E
 		private IEnumerator Start()
 		{
 			yield return null;
@@ -94,6 +93,8 @@ namespace Uuwuu
 			base.gameObject.GetComponent<global::tk2dSprite>().color = new Color(1f, 2f, 1f, 1f);
 			base.gameObject.GetComponent<global::tk2dSprite>().FlipX = true;
 			base.gameObject.GetComponent<global::tk2dSprite>().FlipY = true;
+			string s = "CustomJournal" + Uuwuu.Instance.jh.entrynumber;
+			Modding.ReflectionHelper.SetAttr<EnemyDeathEffects, string>(GetComponent<EnemyDeathEffects>(), "playerDataName", s);
 			base.gameObject.transform.SetScaleX(base.gameObject.transform.GetScaleX() + 0.07f);
 			base.gameObject.transform.SetScaleY(base.gameObject.transform.GetScaleY() + 0.07f);
 			box = base.gameObject.GetComponent<BoxCollider2D>().offset;
